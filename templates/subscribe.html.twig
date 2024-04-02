@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block javascripts %}
+    <script type="text/javascript">
+        // using twig extension
+        const eventSource = new EventSource("{{
+            mercure('this-can-be-anything-but-usually-is-an-IRI')|escape('js')
+        }}");
+
+        // alternative to the twig extension
+        // const eventSource2 = new EventSource(
+        //     'http://hk.local:81/.well-known/mercure?topic=this-can-be-anything-but-usually-is-an-IRI',
+        //     {
+        //         withCredentials: true
+        //     }
+        // );
+
+        eventSource.onmessage = event => {
+            // Will be called every time an update is published by the server
+            console.log(JSON.parse(event.data));
+            // https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent
+            console.log(event.origin);
+            console.log(event.lastEventId);
+
+            const eventData = JSON.parse(event.data);
+            const message = '<div class="alert alert-primary alert-dismissible" role="alert"> ' + eventData.data +' ' +
+                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                '</div>';
+
+            document.getElementById('updatesReceiver').innerHTML = message;
+        };
+
+    </script>
+{% endblock %}
+
+
+
+{% block body %}
+    See console log for more details
+    <div id="updatesReceiver"></div>
+{% endblock %}
+
